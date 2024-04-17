@@ -10,17 +10,23 @@ export class MySQlRepositoryPaciente implements PacienteRepository{
           });
     }
 
-    getPacienteById(pacienteId: number): Promise<Paciente> {
-        const query = "SELECT * FROM pacientes where id_persona = ?";
-      return db
-        .execute(query, [pacienteId])
-        .then((res: any) => {
-          console.log(res);
-          return res[0][0] as Paciente;
-        })
-        .catch((err: any) => {
-          throw new Error(err);
-        });
+    async getPacienteById(pacienteId: number): Promise<Paciente> {
+      const query1 = "SELECT * FROM pacientes where id_persona = ?";
+      const query2 = "SELECT * FROM consultas where id_paciente = ?";
+
+      const [pacienteRes, citasRes] = await Promise.all([
+        db.execute(query1, [pacienteId]),
+        db.execute(query2, [pacienteId])
+      ]);
+
+      const paciente: Paciente = pacienteRes[0] as unknown as Paciente;
+      const citas: any[] = citasRes[0] as any[];
+
+      const obejto = {
+        ...paciente,
+        ...citas
+      }
+      return obejto;
     }
 
     postPaciente(paciente: Paciente): Promise<Paciente> {
