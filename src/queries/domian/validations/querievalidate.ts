@@ -1,4 +1,4 @@
-import z from "zod";
+import z from 'zod'
 import { Consulta } from "../entities/querie";
 
 const ConsultaSchema = z.object({
